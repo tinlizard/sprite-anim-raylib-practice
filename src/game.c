@@ -175,6 +175,8 @@ int main(void) {
                 for(int i=0; i<NUM_IDLE_SPRITES; i++)
                     player->srcIdleRects[i] = (Rectangle) {player->idleTextureWidth*i,0,-player->textureWidth,player->textureHeight};
                 
+                for(int i=0; i<NUM_FIGHT_SPRITES; i++)
+                    player->srcFightRects[i]= (Rectangle){player->textureWidth*i,0,-player->textureWidth,player->textureHeight};
               }
              else{
                  for(int i=0; i<NUM_WALK_SPRITES; i++)
@@ -182,6 +184,10 @@ int main(void) {
 
                 for(int i=0; i<NUM_IDLE_SPRITES; i++)
                      player->srcIdleRects[i] = (Rectangle) {player->idleTextureWidth*i,0,player->textureWidth,player->textureHeight}; 
+
+                 for(int i=0; i<NUM_FIGHT_SPRITES; i++)
+                    player->srcFightRects[i]= (Rectangle){player->textureWidth*i,0,player->textureWidth,player->textureHeight};
+    
              }
             
 
