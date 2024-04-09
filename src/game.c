@@ -86,7 +86,7 @@ void animateWalkPlayer(Player* player, int* walkIndex, float* currentTime){
 
 
 void animateIdlePlayer(Player* player, int* idleIndex, float* currentTime){
-        float idleInterval = 0.03f;
+        float idleInterval = 0.06f;
     
         if(*currentTime >= idleInterval){
             (*idleIndex)++;
@@ -124,7 +124,7 @@ int main(void) {
                 player->isMoving = false;
                 player->isIdling = false;
             }
-            else if(IsKeyDown(KEY_D)){
+            else if(IsKeyDown(KEY_D) || IsKeyPressed(KEY_D)){
                 player->isMoving = true;
                 player->isIdling = false;
                 player->isFighting = false;
@@ -132,7 +132,7 @@ int main(void) {
                 player->destWalkRect.x += 3;
                 player->destRect.x+=3;
             }
-            else if(IsKeyDown(KEY_A)){
+            else if(IsKeyDown(KEY_A) || IsKeyPressed(KEY_A)){
                 player->isMoving = true;
                 player->isIdling = false;
                 player->isFighting = false;
@@ -165,33 +165,33 @@ int main(void) {
             else {
                 player->isIdling = true;
                 player->isMoving = false;
-                //player->facingRight = true;
                 player->isFighting = false;
             }
 
               if(!player->facingRight){
-                player->srcWalkRects[player->walkIndex].width = -IDLE_TEXTURE_LEN/NUM_WALK_SPRITES;
-                player->srcIdleRects[player->idleIndex].width = -IDLE_TEXTURE_LEN/NUM_IDLE_SPRITES;
+                for(int i=0; i<NUM_WALK_SPRITES; i++)
+                    player->srcWalkRects[i] = (Rectangle) {player->walkTextureWidth*i,0,-player->walkTextureWidth,player->textureHeight};
+                
+                for(int i=0; i<NUM_IDLE_SPRITES; i++)
+                    player->srcIdleRects[i] = (Rectangle) {player->idleTextureWidth*i,0,-player->textureWidth,player->textureHeight};
+                
               }
              else{
-                 player->srcWalkRects[player->walkIndex].width = IDLE_TEXTURE_LEN/NUM_WALK_SPRITES;
-                  player->srcIdleRects[player->idleIndex].width = IDLE_TEXTURE_LEN/NUM_IDLE_SPRITES;
-             }
+                 for(int i=0; i<NUM_WALK_SPRITES; i++)
+                    player->srcWalkRects[i] = (Rectangle) {player->walkTextureWidth*i,0,player->walkTextureWidth,player->textureHeight};
 
-            /*
-            if(!player->facingRight)
-                player->srcWalkRects[player->walkIndex].width = -IDLE_TEXTURE_LEN/NUM_WALK_SPRITES;
-            else
-                player->srcWalkRects[player->walkIndex].width = IDLE_TEXTURE_LEN/NUM_WALK_SPRITES;
-            */
+                for(int i=0; i<NUM_IDLE_SPRITES; i++)
+                     player->srcIdleRects[i] = (Rectangle) {player->idleTextureWidth*i,0,player->textureWidth,player->textureHeight}; 
+             }
             
 
-            DrawText(player->facingRight ? "FACING RIGHT" : "FACING LEFT" ,30,30,20,RED); //debugging
-            DrawText(player->isMoving ? "IS MOVING" : "IS NOT MOVING",30,50,20,RED);
-            DrawText(player->isIdling ? "IS IDLING" : "IS NOT IDLING",30,70,20,RED);
+            //DrawText(player->facingRight ? "FACING RIGHT" : "FACING LEFT" ,30,30,20,RED); //debugging
+            //DrawText(player->isMoving ? "IS MOVING" : "IS NOT MOVING",30,50,20,RED);
+            //DrawText(player->isIdling ? "IS IDLING" : "IS NOT IDLING",30,70,20,RED);
+            //DrawText(player->isFighting ? "IS FIGHTING" : "IS NOT FIGHTING",30,90,20,RED);
             //char currentIdleIndexStr[10]; //debugging
-            //sprintf(currentIdleIndexStr,"%d",IDLE_TEXTURE_LEN/NUM_IDLE_SPRITES);  //debugging
-            //DrawText(currentIdleIndexStr,200,45,20,RED); //debugging
+            //sprintf(currentIdleIndexStr,"%f",player->srcWalkRects[player->walkIndex].width);  //debugging
+            //DrawText(currentIdleIndexStr,230,45,20,RED); //debugging
         EndDrawing();
     }
 
