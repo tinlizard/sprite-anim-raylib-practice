@@ -1,123 +1,31 @@
 #include "raylib.h"
-#define TEXTURE_LEN 480
-#define IDLE_TEXTURE_LEN 1200
-#define NUM_FIGHT_SPRITES 4
-#define NUM_WALK_SPRITES 10
-#define NUM_IDLE_SPRITES 10
+#include "player.h"
+#include "platform.h"
 #include <stdlib.h>
 #include <stdio.h>
-
-typedef struct Player {
-   int x, y, textureWidth, textureHeight, idleIndex, 
-   walkIndex, fightIndex, walkTextureWidth, 
-   idleTextureWidth,walkTexureHeight;
-   Texture2D idleTexture, fightTexture, walkTexture;
-   Rectangle srcFightRects[NUM_FIGHT_SPRITES];
-   Rectangle srcWalkRects[NUM_WALK_SPRITES];
-   Rectangle srcIdleRects[NUM_IDLE_SPRITES];
-   //Rectangle idleRect; 
-
-   Rectangle destRect;
-   Rectangle destWalkRect;
-   bool isIdling, isMoving, isFighting, facingRight;
-} Player;
-
-
-Player* initPlayer(){
-    Player* player = malloc(sizeof(Player));
-
-    player->fightTexture = LoadTexture("/home/ben/Downloads/FreeKnight_v1/Colour1/NoOutline/120x80_PNGSheets/crouch_attack.png");
-    player->walkTexture = LoadTexture("/home/ben/Downloads/FreeKnight_v1/Colour1/NoOutline/120x80_PNGSheets/walk.png");
-    player->idleTexture = LoadTexture("/home/ben/Downloads/FreeKnight_v1/Colour1/NoOutline/120x80_PNGSheets/idle.png");
-    player->x = 40;
-    player->y = 250;
-    player->idleIndex = 0;
-    player->walkIndex = 0;
-    player->fightIndex = 0;
-    player->textureWidth = TEXTURE_LEN/NUM_FIGHT_SPRITES;
-    player->walkTextureWidth = IDLE_TEXTURE_LEN/NUM_WALK_SPRITES;
-    player->idleTextureWidth = IDLE_TEXTURE_LEN/NUM_IDLE_SPRITES;
-    player->textureHeight = 80;
-    player->destRect = (Rectangle){player->x,player->y,190,150};
-    player->isIdling = true; 
-    player->isFighting = false;
-    player->isMoving = false;
-    player->destWalkRect = (Rectangle){player->x,player->y,190,150};
-    player->facingRight = true;
-    
-    for(int i=0; i<NUM_FIGHT_SPRITES; i++){
-      player->srcFightRects[i]= (Rectangle){player->textureWidth*i,0,player->textureWidth,player->textureHeight};
-    }
-    for(int i=0; i<NUM_WALK_SPRITES; i++){
-        player->srcWalkRects[i] = (Rectangle) {player->walkTextureWidth*i,0,player->walkTextureWidth,player->textureHeight};
-    }
-
-    for(int i=0; i<NUM_IDLE_SPRITES; i++){
-        player->srcIdleRects[i] = (Rectangle) {player->idleTextureWidth*i,0,player->textureWidth,player->textureHeight};
-    }
-    return player;
-}
-
-void animateFightPlayer(Player* player, int* fightIndex, float* currentTime){
-        float fightInterval = 0.06f;
-    
-        if(*currentTime >= fightInterval){
-            (*fightIndex)++;
-            *currentTime = 0.0f;
-
-            if(*fightIndex>NUM_FIGHT_SPRITES-1){
-                *fightIndex = 0;
-            }
-        }
-}
-
-void animateWalkPlayer(Player* player, int* walkIndex, float* currentTime){
-        float idleInterval = 0.06f;
-    
-        if(*currentTime >= idleInterval){
-            (*walkIndex)++;
-            *currentTime = 0.0f;
-
-            if(*walkIndex>NUM_WALK_SPRITES-1){
-                *walkIndex = 0;
-            }
-        }
-}
-
-
-void animateIdlePlayer(Player* player, int* idleIndex, float* currentTime){
-        float idleInterval = 0.06f;
-    
-        if(*currentTime >= idleInterval){
-            (*idleIndex)++;
-            *currentTime = 0.0f;
-
-            if(*idleIndex>NUM_IDLE_SPRITES-1){
-                *idleIndex = 0;
-            }
-        }
-}
-
-
-
+ 
+static float gravity = 9.81;
+static Texture2D backgroundTexture;
 
 int main(void) {
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = 928;
+    const int screenHeight = 793;
 
-    InitWindow(screenWidth, screenHeight, "Sprite practice");
+    InitWindow(screenWidth, screenHeight, "Knight's Night");
 
     Player* player = initPlayer();
+    Platform* platform = initPlatform();
     float currentTime = GetTime();
-	
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+	backgroundTexture = LoadTexture("/home/ben/Documents/Free Pixel Art Forest/Preview/background.png");
+    SetTargetFPS(60);               
 
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (!WindowShouldClose())    
     {
         BeginDrawing();
             ClearBackground(BLACK);
             currentTime += GetFrameTime();
 	        DrawFPS(10,10);
+            DrawTexture(backgroundTexture,0,0,RAYWHITE);
 
             if(IsKeyDown(KEY_X)){
                 player->isFighting = true;
@@ -137,6 +45,7 @@ int main(void) {
                 player->isIdling = false;
                 player->isFighting = false;
                 player->facingRight = false;
+                player->x -= 3;
                 player->destWalkRect.x-=3;
                 player->destRect.x-=3;
 
@@ -190,6 +99,17 @@ int main(void) {
     
              }
             
+	if(isCollidingWithPlayer(player,platform)){
+		DrawRectangleRec(player->destRect,RED);
+		DrawRectangleRec(player->destWalkRect,BLUE);
+		DrawRectangle(platform->x,platform->y,platform->width,platform->height,RED);
+		gravity = 0;
+	}
+	else {
+		gravity = 9.81;
+		player->destRect.y += (int) gravity;
+		player->destWalkRect.y += (int) gravity;
+	}
 
             //DrawText(player->facingRight ? "FACING RIGHT" : "FACING LEFT" ,30,30,20,RED); //debugging
             //DrawText(player->isMoving ? "IS MOVING" : "IS NOT MOVING",30,50,20,RED);
@@ -198,10 +118,18 @@ int main(void) {
             //char currentIdleIndexStr[10]; //debugging
             //sprintf(currentIdleIndexStr,"%f",player->srcWalkRects[player->walkIndex].width);  //debugging
             //DrawText(currentIdleIndexStr,230,45,20,RED); //debugging
+	    char gravityString[10];
+	    sprintf(gravityString,"%0.2f",gravity);
+	    DrawText(gravityString,30,70,20,RED);
+
+	    char y_pos[10];
+	    sprintf(y_pos,"%f",player->destWalkRect.y);
+	    DrawText(y_pos,30,95,20,RED);
         EndDrawing();
     }
 
-    CloseWindow();        // Close window and OpenGL context
+    CloseWindow();      
     free(player);
+    free(platform);
     return 0;
 }
