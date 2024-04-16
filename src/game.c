@@ -14,9 +14,10 @@ int main(void) {
     InitWindow(screenWidth, screenHeight, "Knight's Night");
 
     Player* player = initPlayer();
-    Platform* platform = initPlatform();
+    Platform* platform = initPlatform(40,750,200,40);
+    Platform* platform2 = initPlatform(280,750,200,40);
     float currentTime = GetTime();
-	backgroundTexture = LoadTexture("/home/ben/Documents/Free Pixel Art Forest/Preview/background.png");
+    backgroundTexture = LoadTexture("/home/ben/Documents/Free Pixel Art Forest/Preview/background.png");
     SetTargetFPS(60);               
 
     while (!WindowShouldClose())    
@@ -26,29 +27,26 @@ int main(void) {
             currentTime += GetFrameTime();
 	        DrawFPS(10,10);
             DrawTexture(backgroundTexture,0,0,RAYWHITE);
-
+	    DrawTexturePro(platform->texture,platform->srcRect,platform->destRect,(Vector2) {0,0}, 0.f,RAYWHITE);
+	    DrawTexturePro(platform2->texture,platform2->srcRect,platform2->destRect,(Vector2){0,0},0.f,RAYWHITE);
             if(IsKeyDown(KEY_X)){
                 player->isFighting = true;
                 player->isMoving = false;
                 player->isIdling = false;
             }
-            else if(IsKeyDown(KEY_D) || IsKeyPressed(KEY_D)){
+            else if(IsKeyDown(KEY_D)){
                 player->isMoving = true;
                 player->isIdling = false;
                 player->isFighting = false;
                 player->facingRight = true;
-                player->destWalkRect.x += 3;
-                player->destRect.x+=3;
+		moveCollisionRect(player,"right");
             }
-            else if(IsKeyDown(KEY_A) || IsKeyPressed(KEY_A)){
+            else if(IsKeyDown(KEY_A)){
                 player->isMoving = true;
                 player->isIdling = false;
                 player->isFighting = false;
                 player->facingRight = false;
-                player->x -= 3;
-                player->destWalkRect.x-=3;
-                player->destRect.x-=3;
-
+                moveCollisionRect(player,"left");
             }
             else {
                 player->isIdling = true;
@@ -100,15 +98,15 @@ int main(void) {
              }
             
 	if(isCollidingWithPlayer(player,platform)){
-		DrawRectangleRec(player->destRect,RED);
-		DrawRectangleRec(player->destWalkRect,BLUE);
-		DrawRectangle(platform->x,platform->y,platform->width,platform->height,RED);
+	//	DrawRectangleRec(player->collisionRect,RED);
+//		DrawRectangle(platform->x,platform->y,platform->width,platform->height,RED);
 		gravity = 0;
 	}
 	else {
 		gravity = 9.81;
 		player->destRect.y += (int) gravity;
 		player->destWalkRect.y += (int) gravity;
+		player->collisionRect.y += (int) gravity;
 	}
 
             //DrawText(player->facingRight ? "FACING RIGHT" : "FACING LEFT" ,30,30,20,RED); //debugging
