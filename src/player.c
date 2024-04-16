@@ -20,6 +20,7 @@ Player* initPlayer(){
     player->isFighting = false;
     player->isMoving = false;
     player->destWalkRect = (Rectangle){player->x,player->y,200,170};
+    player->collisionRect = (Rectangle){player->x+75,player->y+70,50,100};
     player->facingRight = true;
     
     for(int i=0; i<NUM_FIGHT_SPRITES; i++){
@@ -73,4 +74,28 @@ void animateIdlePlayer(Player* player, int* idleIndex, float* currentTime){
                 *idleIndex = 0;
             }
         }
+}
+
+void moveCollisionRect(Player* player, const char* direction) {
+	int numToAdd = 3;
+	if(strcmp(direction, "left")==0){
+		numToAdd = -3;
+		player->destRect.x += numToAdd;
+		player->destWalkRect.x += numToAdd;
+		player->collisionRect.x += numToAdd;
+		printf("direction is left \n");
+	}
+	else if(strcmp(direction, "right")==0){
+		numToAdd = 3;
+		player->destRect.x += numToAdd;
+		player->destWalkRect.x += numToAdd;
+		player->collisionRect.x += numToAdd;
+		printf("direction is right \n");
+	}
+	else {
+	   goto idling;
+	}
+
+idling: 
+	printf("Player is idling\n");
 }
