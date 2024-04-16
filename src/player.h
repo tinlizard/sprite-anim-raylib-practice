@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #define TEXTURE_LEN 480
 #define IDLE_TEXTURE_LEN 1200
 #define NUM_FIGHT_SPRITES 4
@@ -21,6 +22,7 @@ typedef struct {
 
    Rectangle destRect;
    Rectangle destWalkRect;
+   Rectangle collisionRect;
    bool isIdling, isMoving, isFighting, facingRight;
 } Player;
 
@@ -28,5 +30,6 @@ Player* initPlayer();
 void animateFightPlayer(Player* player, int* fightIndex, float* currentTime);
 void animateWalkPlayer(Player* player, int* walkIndex, float* currentTime);
 void animateIdlePlayer(Player* player, int* idleIndex, float* currentTime);
+void moveCollisionRect(Player* player, const char* direction);
 
 #endif
