@@ -8,11 +8,11 @@
 typedef struct {
     int x,y,width,height;
     bool isCollider;
-    Rectangle collisionRect;
+    Rectangle collisionRect, srcRect, destRect;
     Texture2D texture;
 } Platform;
 
-Platform* initPlatform();
+Platform* initPlatform(int x,int y, int width, int height);
 bool isCollidingWithPlayer(Player* player, Platform* platform);
 
 #endif 
