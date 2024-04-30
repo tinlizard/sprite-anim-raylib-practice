@@ -1,6 +1,7 @@
 #include "platform.h"
 #include "player.h"
 
+//platform struct constructor 
 Platform* initPlatform(int x, int y, int width, int height){
     Platform* platform = malloc(sizeof(Platform));
 
@@ -17,10 +18,10 @@ Platform* initPlatform(int x, int y, int width, int height){
     return platform;
 }
 
-//debugging function
+//collision debugging function
 bool isCollidingWithPlayer(Player* player, Platform* platform){
    if(CheckCollisionRecs(player->collisionRect,platform->collisionRect))
-	return true;	
+	   return true;	
    else 
     	return false;
 }
